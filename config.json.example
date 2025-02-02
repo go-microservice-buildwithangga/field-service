@@ -1,0 +1,35 @@
+{ 
+    "port": 0,
+    "appName" : "" ,
+    "appEnv": "",
+    "siginatureKey" :"",
+    "database" : {
+        "host": "",
+        "port": 0,
+        "name": "",
+        "username": "", 
+        "password": "",
+        "maxOpenConnection": 0,
+        "maxLifetimeConnection": 0,
+        "maxIdleConnection": 0,
+        "maxIdleTime": 0
+    },
+    "internalService" : {
+        "host": ":",
+        "signatureKey": ""
+    },
+    "gscType":"",
+    "gcsProjectID":"",
+    "gcsPrivateKeyID":"", 
+    "gcsPrivateKey":"",
+    "gcsClientEmail":"",
+    "gcsClientID":"",
+    "gcsAuthUri":"",
+    "gcsTokenUri":"",
+    "gcsAuthProviderX509CertUrl":"",
+    "gcsClientX509CertUrl":"",
+    "gcsUniverseDomain":"",
+    "gcsBucketName":""
+
+}
+

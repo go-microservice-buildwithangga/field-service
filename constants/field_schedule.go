@@ -28,6 +28,3 @@ func (f FieldScheduleStatus) GetStatusString() string {
 func (f FieldStatusStatusName) GetStatusInt() FieldScheduleStatus {
 	return mapFieldScheduleStatusStringToInt[f]
 }
-
-
-Available.GetStatusString()

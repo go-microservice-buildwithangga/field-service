@@ -10,19 +10,7 @@ import (
 
 var Config AppConfig
 
-type AppConfig struct {
-	Port                  int      `json:"port"`
-	AppName               string   `json:"appName"`
-	AppEnv                string   `json:"appEnv"`
-	SiginatureKey         string   `json:"siginatureKey"`
-	Database              Database `json:"database"`
-	RateLimiterMaxRequest int      `json:"rateLimiterMaxRequest"`
-	RateLimiterTimeSecond int      `json:"rateLimiterTimeSecond"`
-	JwtSecretKey          string   `json:"jwtSecretKey"`
-	JwtExpirationTime     int      `json:"jwtExpirationTime"`
-}
-
-type Database struct {
+type DatabaseConfig struct {
 	Host                  string `json:"host"`
 	Port                  int    `json:"port"`
 	Name                  string `json:"name"`
@@ -32,6 +20,40 @@ type Database struct {
 	MaxLifetimeConnection int    `json:"maxLifetimeConnection"`
 	MaxIdleConnection     int    `json:"maxIdleConnection"`
 	MaxIdleTime           int    `json:"maxIdleTime"`
+}
+
+type InternalService struct {
+	User User `json:"user"`
+}
+
+type User struct {
+	Host         string `json:"host"`
+	SignatureKey string `json:"signatureKey"`
+}
+
+type GCSConfig struct {
+	Type                    string `json:"gscType"`
+	ProjectID               string `json:"gcsProjectID"`
+	PrivateKeyID            string `json:"gcsPrivateKeyID"`
+	PrivateKey              string `json:"gcsPrivateKey"`
+	ClientEmail             string `json:"gcsClientEmail"`
+	ClientID                string `json:"gcsClientID"`
+	AuthURI                 string `json:"gcsAuthUri"`
+	TokenURI                string `json:"gcsTokenUri"`
+	AuthProviderX509CertURL string `json:"gcsAuthProviderX509CertUrl"`
+	ClientX509CertURL       string `json:"gcsClientX509CertUrl"`
+	UniverseDomain          string `json:"gcsUniverseDomain"`
+	BucketName              string `json:"gcsBucketName"`
+}
+
+type AppConfig struct {
+	Port            int             `json:"port"`
+	AppName         string          `json:"appName"`
+	AppEnv          string          `json:"appEnv"`
+	SignatureKey    string          `json:"siginatureKey"`
+	Database        DatabaseConfig  `json:"database"`
+	InternalService InternalService `json:"internalService"`
+	GCS             GCSConfig       `json:"gcs"`
 }
 
 func Init() {

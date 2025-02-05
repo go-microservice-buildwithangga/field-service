@@ -1,4 +1,6 @@
 package constants
 
-const Success = "success"
-const Error = "error"
+const (
+	Success = "success"
+	Error   = "error"
+)

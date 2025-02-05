@@ -46,3 +46,4 @@ type FieldRequestParam struct {
 	SortColumn *string `form:"sortColumn"`
 	SortOrder  *string `form:"sortOrder"`
 }
+

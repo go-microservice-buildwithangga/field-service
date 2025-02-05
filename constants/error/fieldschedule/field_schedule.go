@@ -2,11 +2,12 @@ package error
 
 import "errors"
 
-var ErrFieldStatusNotFound = errors.New("field status not found")
-
-var ErrFieldStatusIsExists = errors.New("field status already exists")
+var (
+	ErrFieldScheduleNotFound = errors.New("field schedule not found")
+	ErrFieldScheduleIsExist  = errors.New("field schedule already exist")
+)
 
 var FieldScheduleErrors = []error{
-	ErrFieldStatusNotFound,
-	ErrFieldStatusIsExists,
+	ErrFieldScheduleNotFound,
+	ErrFieldScheduleIsExist,
 }

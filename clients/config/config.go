@@ -1,52 +1,53 @@
-package clients
+package config
 
 import "github.com/parnurzeal/gorequest"
 
-type ClientsConfig struct {
+type ClientConfig struct {
 	client       *gorequest.SuperAgent
-	baseUrl      string
+	baseURL      string
 	signatureKey string
 }
 
 type IClientConfig interface {
 	Client() *gorequest.SuperAgent
-	BaseUrl() string
+	BaseURL() string
 	SignatureKey() string
 }
 
-type Option func(*ClientsConfig)
+type Option func(*ClientConfig)
 
-func NewClientConfig(opts ...Option) IClientConfig {
-	cfg := &ClientsConfig{
+func NewClientConfig(options ...Option) IClientConfig {
+	clientConfig := &ClientConfig{
 		client: gorequest.New().
-			Set("content-type", "application/json").
-			Set("accept", "application/json"),
+			Set("Content-Type", "application/json").
+			Set("Accept", "application/json"),
 	}
-	for _, opt := range opts {
-		opt(cfg)
+	for _, option := range options {
+		option(clientConfig)
 	}
-	return cfg
-
+	return clientConfig
 }
 
-func (c *ClientsConfig) Client() *gorequest.SuperAgent {
+func (c *ClientConfig) Client() *gorequest.SuperAgent {
 	return c.client
 }
-func (c *ClientsConfig) BaseUrl() string {
-	return c.baseUrl
+
+func (c *ClientConfig) BaseURL() string {
+	return c.baseURL
 }
-func (c *ClientsConfig) SignatureKey() string {
+
+func (c *ClientConfig) SignatureKey() string {
 	return c.signatureKey
 }
 
-func WithBaseUrl(baseUrl string) Option {
-	return func(cfg *ClientsConfig) {
-		cfg.baseUrl = baseUrl
+func WithBaseURL(baseURL string) Option {
+	return func(c *ClientConfig) {
+		c.baseURL = baseURL
 	}
 }
 
 func WithSignatureKey(signatureKey string) Option {
-	return func(cfg *ClientsConfig) {
-		cfg.signatureKey = signatureKey
+	return func(c *ClientConfig) {
+		c.signatureKey = signatureKey
 	}
 }

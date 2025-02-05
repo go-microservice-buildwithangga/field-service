@@ -50,4 +50,5 @@ func HttpResponse(param ParamHTTPResp) {
 		Data:    param.Data,
 		Token:   param.Token,
 	})
+
 }

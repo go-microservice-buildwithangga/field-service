@@ -9,6 +9,7 @@ import (
 	"field-service/domain/models"
 	"fmt"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -20,7 +21,9 @@ type IFieldRepository interface {
 	FindAllWithPagination(context.Context, *dto.FieldRequestParam) ([]models.Field, int64, error)
 	FindAllWithoutPagination(context.Context) ([]models.Field, error)
 	FindByUUID(context.Context, string) (*models.Field, error)
-	Create(context.Context, string, *models.Field) error
+	Create(context.Context, *models.Field) error
+	Update(context.Context, string, *models.Field) error
+	Delete(context.Context, string) error
 }
 
 func NewFieldRepository(db *gorm.DB) IFieldRepository {
@@ -30,8 +33,45 @@ func NewFieldRepository(db *gorm.DB) IFieldRepository {
 }
 
 // Create implements IFieldRepository.
-func (f *FieldRepository) Create(context.Context, string, *models.Field) error {
-	panic("unimplemented")
+func (f *FieldRepository) Create(ctx context.Context, req *models.Field) error {
+	field := models.Field{
+		UUID:         uuid.New(),
+		Code:         req.Code,
+		Name:         req.Name,
+		Images:       req.Images,
+		PricePerHour: req.PricePerHour,
+	}
+
+	err := f.db.WithContext(ctx).Create(&field).Error
+	if err != nil {
+		return error2.WrapError(errConst.ErrSQLError)
+	}
+	return nil
+}
+
+// Update implements IFieldRepository.
+func (f *FieldRepository) Update(ctx context.Context, UUID string, req *models.Field) error {
+	field := models.Field{
+		Code:         req.Code,
+		Name:         req.Name,
+		Images:       req.Images,
+		PricePerHour: req.PricePerHour,
+	}
+
+	err := f.db.WithContext(ctx).Where("uuid = ?", UUID).Updates(&field).Error
+	if err != nil {
+		return error2.WrapError(errConst.ErrSQLError)
+	}
+	return nil
+}
+
+// Delete implements IFieldRepository.
+func (f *FieldRepository) Delete(ctx context.Context, UUID string) error {
+	err := f.db.WithContext(ctx).Where("uuid = ?", UUID).Delete(&models.Field{}).Error
+	if err != nil {
+		return error2.WrapError(errConst.ErrSQLError)
+	}
+	return nil
 }
 
 // FindAllWithPagination implements IFieldRepository.

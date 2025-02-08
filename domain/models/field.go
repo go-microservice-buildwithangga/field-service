@@ -11,7 +11,7 @@ type Field struct {
 	UUID           uuid.UUID `gorm:"type:uuid;default:not null;unique"`
 	Code           string    `gorm:"type:varchar(15);not null"`
 	Name           string    `gorm:"type:varchar(50);not null"`
-	pricePerHour   int       `gorm:"type:int;not null"`
+	PricePerHour   int       `gorm:"type:int;not null"`
 	Images         string    `gorm:"type:text[];not null"`
 	CreatedAt      *time.Time
 	UpdatedAt      *time.Time

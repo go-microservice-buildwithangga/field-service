@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"errors"
 	error2 "field-service/common/error"
 	errConst "field-service/constants/error"
 	errConstField "field-service/constants/error/field"
@@ -115,7 +116,7 @@ func (f *FieldRepository) FindByUUID(ctx context.Context, UUID string) (*models.
 	var field models.Field
 	err := f.db.WithContext(ctx).Where("uuid = ?", UUID).First(&field).Error
 	if err != nil {
-		if err.Error() == "record not found" {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, error2.WrapError(errConstField.ErrFieldNotFound)
 		}
 		return nil, error2.WrapError(errConst.ErrSQLError)

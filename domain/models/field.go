@@ -4,15 +4,16 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/lib/pq"
 )
 
 type Field struct {
-	ID             uint      `gorm:"primaryKey,autoIncrement"`
-	UUID           uuid.UUID `gorm:"type:uuid;default:not null;unique"`
-	Code           string    `gorm:"type:varchar(15);not null"`
-	Name           string    `gorm:"type:varchar(50);not null"`
-	PricePerHour   int       `gorm:"type:int;not null"`
-	Images         string    `gorm:"type:text[];not null"`
+	ID             uint           `gorm:"primaryKey,autoIncrement"`
+	UUID           uuid.UUID      `gorm:"type:uuid;default:not null;unique"`
+	Code           string         `gorm:"type:varchar(15);not null"`
+	Name           string         `gorm:"type:varchar(50);not null"`
+	PricePerHour   int            `gorm:"type:int;not null"`
+	Images         pq.StringArray `gorm:"type:text[];not null"`
 	CreatedAt      *time.Time
 	UpdatedAt      *time.Time
 	DeletedAt      *time.Time

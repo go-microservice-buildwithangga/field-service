@@ -88,8 +88,24 @@ func (f *FieldService) GetAllWithoutPagination(ctx context.Context) ([]dto.Field
 }
 
 // GetByUUID implements IFieldService.
-func (f *FieldService) GetByUUID(context.Context, string) (*dto.FieldResponse, error) {
-	panic("unimplemented")
+func (f *FieldService) GetByUUID(ctx context.Context, uuid string) (*dto.FieldResponse, error) {
+	field, err := f.repository.GetField().FindByUUID(ctx, uuid)
+	if err != nil {
+		return nil, err
+	}
+
+	pricePerHour := float64(field.PricePerHour)
+	fieldResult := dto.FieldResponse{
+		UUID:         field.UUID,
+		Code:         field.Code,
+		Name:         field.Name,
+		PricePerHour: util.RupiahFormat(&pricePerHour),
+		Images:       field.Images,
+		CreatedAt:    field.CreatedAt,
+		UpdatedAt:    field.UpdatedAt,
+	}
+
+	return &fieldResult, nil
 }
 
 // Update implements IFieldService.

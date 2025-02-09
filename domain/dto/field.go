@@ -25,7 +25,7 @@ type FieldResponse struct {
 	UUID         uuid.UUID `json:"uuid"`
 	Code         string    `json:"code"`
 	Name         string    `json:"name"`
-	PricePerHour int       `json:"pricePerHour"`
+	PricePerHour string    `json:"pricePerHour"`
 	Images       []string  `json:"images"`
 	CreatedAt    *time.Time
 	UpdatedAt    *time.Time
@@ -46,4 +46,3 @@ type FieldRequestParam struct {
 	SortColumn *string `form:"sortColumn"`
 	SortOrder  *string `form:"sortOrder"`
 }
-

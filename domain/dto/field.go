@@ -25,7 +25,7 @@ type FieldResponse struct {
 	UUID         uuid.UUID `json:"uuid"`
 	Code         string    `json:"code"`
 	Name         string    `json:"name"`
-	PricePerHour string    `json:"pricePerHour"`
+	PricePerHour any       `json:"pricePerHour"`
 	Images       []string  `json:"images"`
 	CreatedAt    *time.Time
 	UpdatedAt    *time.Time

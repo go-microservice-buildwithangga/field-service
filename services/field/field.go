@@ -1,11 +1,21 @@
 package services
 
 import (
+	"bytes"
 	"context"
 	"field-service/common/gcs"
 	"field-service/common/util"
+	errConst "field-service/constants/error"
 	"field-service/domain/dto"
+	"field-service/domain/models"
 	"field-service/repositories"
+	"fmt"
+	"io"
+	"mime/multipart"
+	"path"
+	"time"
+
+	"github.com/google/uuid"
 )
 
 type FieldService struct {
@@ -30,13 +40,46 @@ func NewFieldService(repository repositories.IRepositoryRegistry, gcs gcs.IGCSCl
 }
 
 // Create implements IFieldService.
-func (f *FieldService) Create(context.Context, *dto.FieldRequest) (*dto.FieldResponse, error) {
-	panic("unimplemented")
+func (f *FieldService) Create(ctx context.Context, request *dto.FieldRequest) (*dto.FieldResponse, error) {
+	imageUrl, err := f.uploadImage(ctx, request.Images)
+	if err != nil {
+		return nil, err
+	}
+
+	field, err := f.repository.GetField().Create(ctx, &models.Field{
+		Code:         request.Code,
+		Name:         request.Name,
+		PricePerHour: request.PricePerHour,
+		Images:       imageUrl,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	response := dto.FieldResponse{
+		UUID:         field.UUID,
+		Code:         field.Code,
+		Name:         field.Name,
+		PricePerHour: field.PricePerHour,
+		Images:       field.Images,
+		CreatedAt:    field.CreatedAt,
+		UpdatedAt:    field.UpdatedAt,
+	}
+	return &response, nil
 }
 
 // Delete implements IFieldService.
-func (f *FieldService) Delete(context.Context, string) error {
-	panic("unimplemented")
+func (f *FieldService) Delete(ctx context.Context, uuid string) error {
+	_, err := f.repository.GetField().FindByUUID(ctx, uuid)
+	if err != nil {
+		return err
+	}
+
+	err = f.repository.GetField().Delete(ctx, uuid)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // GetAllWithPagination implements IFieldService.
@@ -109,6 +152,96 @@ func (f *FieldService) GetByUUID(ctx context.Context, uuid string) (*dto.FieldRe
 }
 
 // Update implements IFieldService.
-func (f *FieldService) Update(context.Context, string, *dto.UpdateFieldRequest) (*dto.FieldResponse, error) {
-	panic("unimplemented")
+func (f *FieldService) Update(ctx context.Context, uuidParam string, request *dto.UpdateFieldRequest) (*dto.FieldResponse, error) {
+	field, err := f.repository.GetField().FindByUUID(ctx, uuidParam)
+	if err != nil {
+		return nil, err
+	}
+
+	var imageUrls []string
+	if request.Images == nil {
+		imageUrls = field.Images
+	} else {
+		imageUrls, err = f.uploadImage(ctx, request.Images)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	fieldResult, err := f.repository.GetField().Update(ctx, uuidParam, &models.Field{
+		Code:         request.Code,
+		Name:         request.Name,
+		PricePerHour: request.PricePerHour,
+		Images:       imageUrls,
+	})
+
+	uuidParsed, _ := uuid.Parse(uuidParam)
+	response := dto.FieldResponse{
+		UUID:         uuidParsed,
+		Code:         fieldResult.Code,
+		Name:         fieldResult.Name,
+		PricePerHour: fieldResult.PricePerHour,
+		Images:       fieldResult.Images,
+		CreatedAt:    fieldResult.CreatedAt,
+		UpdatedAt:    fieldResult.UpdatedAt,
+	}
+	return &response, nil
+}
+
+func (f *FieldService) validateUpload(images []multipart.FileHeader) error {
+	// Check if images is nil or empty
+	if images == nil || len(images) == 0 {
+		return errConst.ErrInvalidUploadFile
+	}
+
+	// Check if images size is too big, max 5MB
+	for _, image := range images {
+		if image.Size > 5*1024*1024 {
+			return errConst.ErrSizeTooBig
+		}
+	}
+	return nil
+}
+
+func (f *FieldService) processAndUploadImage(ctx context.Context, image multipart.FileHeader) (string, error) {
+	// Open image file
+	file, err := image.Open()
+	if err != nil {
+		return "", err
+	}
+	// Close file after function ends, defer will be called after function ends
+	defer file.Close()
+
+	// Copy image file to buffer
+	buffer := new(bytes.Buffer)
+	_, err = io.Copy(buffer, file)
+	if err != nil {
+		return "", err
+	}
+	// Upload image to GCS
+	filename := fmt.Sprintf("images/%s-%s-%s", time.Now().Format("20060102150405"), image.Filename, path.Ext(image.Filename))
+	url, err := f.gcs.UploadFile(ctx, filename, buffer.Bytes())
+	if err != nil {
+		return "", err
+	}
+	return url, nil
+}
+
+func (f *FieldService) uploadImage(ctx context.Context, images []multipart.FileHeader) ([]string, error) {
+	// Validate images
+	err := f.validateUpload(images)
+	if err != nil {
+		return nil, err
+	}
+	// Process and upload images
+	urls := make([]string, 0, len(images))
+	// Loop through images
+	for _, image := range images {
+		url, err := f.processAndUploadImage(ctx, image)
+		if err != nil {
+			return nil, err
+		}
+		urls = append(urls, url)
+	}
+	return urls, nil
 }

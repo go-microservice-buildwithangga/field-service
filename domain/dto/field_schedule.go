@@ -9,18 +9,18 @@ import (
 )
 
 type FieldScheduleRequest struct {
-	FieldID uint     `json:"fieldID" validate:"required"`
+	FieldID string   `json:"fieldID" validate:"required"`
 	Date    string   `json:"date" validate:"required"`
-	TimeID  []string `json:"timeIDs" validate:"required"`
+	TimeIDs []string `json:"timeIDs" validate:"required"`
 }
 
 type GenerateFieldScheduleFromOneMonthRequest struct {
-	FieldID uint `json:"fieldID" validate:"required"`
+	FieldID string `json:"fieldID" validate:"required"`
 }
 
 type UpdateFieldScheduleRequest struct {
-	Date   string   `json:"date" validate:"required"`
-	TimeID []string `json:"timeIDs" validate:"required"`
+	Date   string `json:"date" validate:"required"`
+	TimeID string `json:"timeIDs" validate:"required"`
 }
 
 type UpdateStatusScheduleRquest struct {

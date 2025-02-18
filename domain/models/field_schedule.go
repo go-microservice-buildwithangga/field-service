@@ -12,8 +12,8 @@ type FieldSchedule struct {
 	ID        uint                          `gorm:"primaryKey,autoIncrement"`
 	UUID      uuid.UUID                     `gorm:"type:uuid;default:not null;unique"`
 	FieldID   uint                          `gorm:"type:int;not null"`
-	timeID    uint                          `gorm:"type:int;not null"`
-	Date      *time.Time                    `gorm:"type:date;not null"`
+	TimeID    uint                          `gorm:"type:int;not null"`
+	Date      time.Time                     `gorm:"type:date;not null"`
 	Status    constants.FieldScheduleStatus `gorm:"type:int;not null"`
 	CreatedAt *time.Time
 	UpdatedAt *time.Time

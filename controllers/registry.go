@@ -20,7 +20,7 @@ type IControllerRegistry interface {
 	GetTime() timeController.ITimeController
 }
 
-func (r *Registry) NewControllerRegistry(services services.IServiceRegistry) IControllerRegistry {
+func NewControllerRegistry(services services.IServiceRegistry) IControllerRegistry {
 	return &Registry{
 		services: services,
 	}

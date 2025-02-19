@@ -314,6 +314,7 @@ func (s *FieldScheduleService) convertMonthName(inputDate string) string {
 		"Nov": "Nov",
 		"Dec": "Des",
 	}
+
 	formattedDate := date.Format("02 Jan")
 	day := formattedDate[:3]
 	month := formattedDate[3:]

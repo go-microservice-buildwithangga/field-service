@@ -4,30 +4,175 @@ import (
 	errCommon "field-service/common/error"
 	"field-service/common/response"
 	"field-service/domain/dto"
-	services "field-service/services/field"
+	"field-service/services"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
 )
 
 type FieldController struct {
-	fieldService services.IFieldService
+	service services.IServiceRegistry
 }
 
 type IFieldController interface {
 	GetAllWithPagination(ctx *gin.Context)
-	GetAllWithoutPagination(ctx *gin.Context)
-	GetByUUID(ctx *gin.Context)
-	Create(ctx *gin.Context)
-	Update(ctx *gin.Context)
-	Delete(ctx *gin.Context)
+	GetAllWithoutPagination(*gin.Context)
+	GetByUUID(*gin.Context)
+	Create(*gin.Context)
+
+	Update(*gin.Context)
+
+	Delete(*gin.Context)
 }
 
-func NewFieldController(fieldService services.IFieldService) *FieldController {
+func NewFieldController(service services.IServiceRegistry) *FieldController {
 	return &FieldController{
-		fieldService: fieldService,
+		service: service,
 	}
+}
+
+func (f *FieldController) Delete(ctx *gin.Context) {
+	err := f.service.GetField().Delete(ctx, ctx.Param("uuid"))
+	if err != nil {
+		response.HttpResponse(response.ParamHTTPResp{
+			Code:  http.StatusInternalServerError,
+			Error: err,
+			Gin:   ctx,
+		})
+		return
+	}
+
+	response.HttpResponse(response.ParamHTTPResp{
+		Code: http.StatusOK,
+		Gin:  ctx,
+	})
+}
+
+func (f *FieldController) Update(ctx *gin.Context) {
+	var request dto.UpdateFieldRequest
+	err := ctx.ShouldBindWith(&request, binding.FormMultipart)
+	if err != nil {
+		response.HttpResponse(response.ParamHTTPResp{
+			Code:  http.StatusBadRequest,
+			Error: err,
+			Gin:   ctx,
+		})
+		return
+	}
+
+	validate := validator.New()
+	if err = validate.Struct(request); err != nil {
+		errMessage := http.StatusText(http.StatusUnprocessableEntity)
+		dataErr := errCommon.ErrValidationResponse(err)
+		response.HttpResponse(response.ParamHTTPResp{
+			Code:    http.StatusUnprocessableEntity,
+			Data:    dataErr,
+			Message: &errMessage,
+			Error:   err,
+			Gin:     ctx,
+		})
+		return
+	}
+
+	result, err := f.service.GetField().Update(ctx, ctx.Param("uuid"), &request)
+	if err != nil {
+		response.HttpResponse(response.ParamHTTPResp{
+			Code:  http.StatusInternalServerError,
+			Error: err,
+			Gin:   ctx,
+		})
+		return
+	}
+
+	response.HttpResponse(response.ParamHTTPResp{
+		Code: http.StatusOK,
+		Data: result,
+		Gin:  ctx,
+	})
+
+}
+
+func (f *FieldController) Create(ctx *gin.Context) {
+	var request dto.FieldRequest
+	err := ctx.ShouldBindWith(&request, binding.FormMultipart)
+	if err != nil {
+		response.HttpResponse(response.ParamHTTPResp{
+			Code:  http.StatusBadRequest,
+			Error: err,
+			Gin:   ctx,
+		})
+	}
+
+	validate := validator.New()
+	if err = validate.Struct(request); err != nil {
+		errMessage := http.StatusText(http.StatusUnprocessableEntity)
+		errResponse := errCommon.ErrValidationResponse(err)
+		response.HttpResponse(response.ParamHTTPResp{
+			Code:    http.StatusUnprocessableEntity,
+			Error:   err,
+			Message: &errMessage,
+			Data:    errResponse,
+			Gin:     ctx,
+		})
+
+		return
+	}
+
+	result, err := f.service.GetField().Create(ctx, &request)
+	if err != nil {
+		response.HttpResponse(response.ParamHTTPResp{
+			Code:  http.StatusInternalServerError,
+			Error: err,
+			Gin:   ctx,
+		})
+	}
+
+	response.HttpResponse(response.ParamHTTPResp{
+		Code: http.StatusCreated,
+		Data: result,
+		Gin:  ctx,
+	})
+
+}
+
+func (f *FieldController) GetByUUID(ctx *gin.Context) {
+	result, err := f.service.GetField().GetByUUID(ctx, ctx.Param("uuid"))
+	if err != nil {
+		response.HttpResponse(response.ParamHTTPResp{
+			Code:  http.StatusBadRequest,
+			Error: err,
+			Gin:   ctx,
+		})
+		return
+	}
+
+	response.HttpResponse(response.ParamHTTPResp{
+		Code: http.StatusOK,
+		Data: result,
+		Gin:  ctx,
+	})
+
+}
+
+func (f *FieldController) GetAllWithoutPagination(ctx *gin.Context) {
+	result, err := f.service.GetField().GetAllWithoutPagination(ctx)
+	if err != nil {
+		response.HttpResponse(response.ParamHTTPResp{
+			Code:  http.StatusBadRequest,
+			Error: err,
+			Gin:   ctx,
+		})
+		return
+	}
+
+	response.HttpResponse(response.ParamHTTPResp{
+		Code: http.StatusOK,
+		Data: result,
+		Gin:  ctx,
+	})
+
 }
 func (f *FieldController) GetAllWithPagination(ctx *gin.Context) {
 	var params dto.FieldRequestParam
@@ -44,30 +189,29 @@ func (f *FieldController) GetAllWithPagination(ctx *gin.Context) {
 		errorMessage := http.StatusText(http.StatusBadRequest)
 		errorResponse := errCommon.ErrValidationResponse(err)
 		response.HttpResponse(response.ParamHTTPResp{
-			Code:     http.StatusBadRequest,
-			Error:    err,
-			Messsage: &errorMessage,
-			Data:     errorResponse,
-			Gin:      ctx,
+			Code:    http.StatusBadRequest,
+			Error:   err,
+			Message: &errorMessage,
+			Data:    errorResponse,
+			Gin:     ctx,
 		})
 		return
 	}
 
-	return
-	// result, err := f.GetAllWithPagination(ctx, &params)
-	// if err != nil {
-	// 	response.HttpResponse(response.ParamHTTPResp{
-	// 		Code:  http.StatusInternalServerError,
-	// 		Error: err,
-	// 		Gin:   ctx,
-	// 	})
-	// 	return
-	// }
-	// response.HttpResponse(response.ParamHTTPResp{
-	// 	Code:  http.StatusOK,
-	// 	Error: nil,
-	// 	Data:  result,
-	// 	Gin:   ctx,
-	// })
+	result, err := f.service.GetField().GetAllWithPagination(ctx, &params)
+	if err != nil {
+		response.HttpResponse(response.ParamHTTPResp{
+			Code:  http.StatusBadRequest,
+			Error: err,
+			Gin:   ctx,
+		})
+		return
+	}
+
+	response.HttpResponse(response.ParamHTTPResp{
+		Code: http.StatusOK,
+		Data: result,
+		Gin:  ctx,
+	})
 
 }

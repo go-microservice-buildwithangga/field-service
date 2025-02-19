@@ -17,12 +17,12 @@ type Response struct {
 }
 
 type ParamHTTPResp struct {
-	Code     int
-	Error    error
-	Messsage *string
-	Gin      *gin.Context
-	Data     interface{}
-	Token    *string
+	Code    int
+	Error   error
+	Message *string
+	Gin     *gin.Context
+	Data    interface{}
+	Token   *string
 }
 
 func HttpResponse(param ParamHTTPResp) {
@@ -37,8 +37,8 @@ func HttpResponse(param ParamHTTPResp) {
 		return
 	}
 	message := errConst.ErrInternalServerError.Error()
-	if param.Messsage != nil {
-		message = *param.Messsage
+	if param.Message != nil {
+		message = *param.Message
 	} else if param.Error != nil {
 		if errConst.ErrMapping(param.Error) {
 			message = param.Error.Error()

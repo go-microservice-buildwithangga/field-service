@@ -27,9 +27,9 @@ func InitDatabase() (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	sqlDb.SetMaxIdleConns(config.Database.MaxIdleConnection)
-	sqlDb.SetMaxOpenConns(config.Database.MaxOpenConnection)
-	sqlDb.SetConnMaxLifetime(time.Duration(config.Database.MaxIdleConnection) * time.Second)
+	sqlDb.SetMaxIdleConns(config.Database.MaxIdleConnections)
+	sqlDb.SetMaxOpenConns(config.Database.MaxOpenConnections)
+	sqlDb.SetConnMaxLifetime(time.Duration(config.Database.MaxIdleConnections) * time.Second)
 	sqlDb.SetConnMaxIdleTime(time.Duration(config.Database.MaxIdleTime))
 	return db, nil
 }

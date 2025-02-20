@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"math"
 	"os"
-	"path/filepath"
 	"reflect"
 	"strconv"
 	"strings"
@@ -77,21 +76,24 @@ func RupiahFormat(amount *float64) string {
 	return fmt.Sprintf("Rp.%s", stringValue)
 }
 
-func BindFromJSON(dest any, fileName string, configType string, configDir string) error {
+func BindFromJSON(dest any, filename, path string) error {
 	v := viper.New()
-	ext := filepath.Ext(fileName)                     // mengambil ekstensi file
-	baseFileName := fileName[:len(fileName)-len(ext)] // menghilangkan ekstensi file
-	v.SetConfigType(configType)                       // set config type dengan parameter
-	v.SetConfigName(baseFileName)                     //set nama file tanpa ekstensi
-	v.AddConfigPath(configDir)                        //set lokasi path file
-	if err := v.ReadInConfig(); err != nil {
-		logrus.Errorf("Failed to read config file : %v", err)
+
+	v.SetConfigType("json")
+	v.AddConfigPath(path)
+	v.SetConfigName(filename)
+
+	err := v.ReadInConfig()
+	if err != nil {
 		return err
 	}
-	if err := v.Unmarshal(&dest); err != nil {
-		logrus.Errorf("Failed to unmarshal : %v", err)
+
+	err = v.Unmarshal(&dest)
+	if err != nil {
+		logrus.Errorf("failed to unmarshal: %v", err)
 		return err
 	}
+
 	return nil
 }
 

@@ -124,7 +124,9 @@ func initGCS() gcs.IGCSClient {
 		ClientX509CertURL:       config.Config.GCSClientX509CertURL,
 		UniverseDomain:          config.Config.GCSUniverseDomain,
 	}
-
-	gcsClient := gcs.NewGCSClient(gcsServiceAccount, config.Config.GCSBucketName)
+	gcsClient := gcs.NewGCSClient(
+		gcsServiceAccount,
+		config.Config.GCSBucketName,
+	)
 	return gcsClient
 }

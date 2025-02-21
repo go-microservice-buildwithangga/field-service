@@ -103,6 +103,7 @@ func (f *FieldController) Create(ctx *gin.Context) {
 			Error: err,
 			Gin:   ctx,
 		})
+		return
 	}
 
 	validate := validator.New()
@@ -127,6 +128,7 @@ func (f *FieldController) Create(ctx *gin.Context) {
 			Error: err,
 			Gin:   ctx,
 		})
+		return
 	}
 
 	response.HttpResponse(response.ParamHTTPResp{

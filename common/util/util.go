@@ -2,6 +2,7 @@ package util
 
 import (
 	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"math"
 	"os"
@@ -60,10 +61,9 @@ func GeneratePagination(params PaginationParam) PaginationResult {
 func GenerateSHA256(inputString string) string {
 	hash := sha256.New()
 	hash.Write([]byte(inputString))
-	hasBytes := hash.Sum(nil)
-	hashString := string(hasBytes)
+	hashBytes := hash.Sum(nil)
+	hashString := hex.EncodeToString(hashBytes)
 	return hashString
-
 }
 
 func RupiahFormat(amount *float64) string {

@@ -7,6 +7,7 @@ var (
 	ErrSQLError            = errors.New("database server failed to execute query")
 	ErrTooManyRequests     = errors.New("too many requests")
 	ErrUnauthorized        = errors.New("unauthorized")
+	ErrApiKey              = errors.New("API Key not match")
 	ErrInvalidToken        = errors.New("invalid token")
 	ErrInvalidUploadFile   = errors.New("invalid upload file")
 	ErrSizeTooBig          = errors.New("size too big")

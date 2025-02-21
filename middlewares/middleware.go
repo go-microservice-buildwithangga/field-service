@@ -77,9 +77,8 @@ func validateAPIKey(c *gin.Context) error {
 	hash := sha256.New()
 	hash.Write([]byte(validateKey))
 	resultHash := hex.EncodeToString(hash.Sum(nil))
-
 	if apiKey != resultHash {
-		return errConstant.ErrUnauthorized
+		return errConstant.ErrApiKey
 	}
 	return nil
 }

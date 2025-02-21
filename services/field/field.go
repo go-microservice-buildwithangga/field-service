@@ -153,6 +153,7 @@ func (f *FieldService) GetByUUID(ctx context.Context, uuid string) (*dto.FieldRe
 
 // Update implements IFieldService.
 func (f *FieldService) Update(ctx context.Context, uuidParam string, request *dto.UpdateFieldRequest) (*dto.FieldResponse, error) {
+
 	field, err := f.repository.GetField().FindByUUID(ctx, uuidParam)
 	if err != nil {
 		return nil, err
